@@ -49,7 +49,6 @@ module VagrantPlugins
           env[:machine].id = server_id
 
           waiting_for_server_to_be_built(env, server_id)
-          assign_floating_ip(env, server_id)
           attach_volumes(env, server_id, options[:volumes]) unless options[:volumes].empty?
 
           @app.call(env)
@@ -140,16 +139,6 @@ module VagrantPlugins
               sleep retry_interval
             end
           end
-        end
-
-        def assign_floating_ip(env, server_id)
-          floating_ip = @resolver.resolve_floating_ip(env)
-          return if !floating_ip || floating_ip.empty?
-          @logger.info "Using floating IP #{floating_ip}"
-          env[:ui].info(I18n.t('vagrant_openstack.using_floating_ip', floating_ip: floating_ip))
-          env[:openstack_client].nova.add_floating_ip(env, server_id, floating_ip)
-        rescue Errors::UnableToResolveFloatingIP
-          @logger.info 'Vagrant was unable to resolve FloatingIP, continue assuming it is not necessary'
         end
 
         def attach_volumes(env, server_id, volumes)
