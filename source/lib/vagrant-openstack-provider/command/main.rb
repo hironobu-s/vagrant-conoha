@@ -6,7 +6,6 @@ module VagrantPlugins
         { name: :'flavor-list', file: 'flavor_list', clazz: 'FlavorList' },
         { name: :'network-list', file: 'network_list', clazz: 'NetworkList' },
         { name: :'subnet-list', file: 'subnet_list', clazz: 'SubnetList' },
-        { name: :'floatingip-list', file: 'floatingip_list', clazz: 'FloatingIpList' },
         { name: :'volume-list', file: 'volume_list', clazz: 'VolumeList' },
         { name: :'reset', file: 'reset', clazz: 'Reset' }
       ]
