@@ -5,8 +5,8 @@ describe VagrantPlugins::ConoHa::ConfigResolver do
     double('config').tap do |config|
       config.stub(:tenant_name) { 'testTenant' }
       config.stub(:server_name) { 'testName' }
-      config.stub(:floating_ip) { nil }
-      config.stub(:floating_ip_pool) { nil }
+      config.stub(:floating_ip) { false }
+      config.stub(:floating_ip_pool) { false }
       config.stub(:floating_ip_pool_always_allocate) { false }
       config.stub(:keypair_name) { nil }
       config.stub(:public_key_path) { nil }
@@ -228,142 +228,142 @@ describe VagrantPlugins::ConoHa::ConfigResolver do
     end
   end
 
-  describe 'resolve_floating_ip' do
-    context 'with config.floating_ip specified' do
-      it 'return the specified floating ip' do
-        config.stub(:floating_ip) { '80.80.80.80' }
-        @action.resolve_floating_ip(env).should eq('80.80.80.80')
-      end
-    end
+  # describe 'resolve_floating_ip' do
+  #   context 'with config.floating_ip specified' do
+  #     it 'return the specified floating ip' do
+  #       config.stub(:floating_ip) { '80.80.80.80' }
+  #       @action.resolve_floating_ip(env).should eq('80.80.80.80')
+  #     end
+  #   end
 
-    context 'with only one config.floating_ip_pool specified' do
-      context 'if an ip in the same pool is available' do
-        context 'with config.floating_ip_pool_always_allocate true' do
-          it 'allocate a new floating_ip from the pool' do
-            config.stub(:floating_ip_pool_always_allocate) { true }
-            nova.stub(:get_all_floating_ips).with(anything) do
-              [FloatingIP.new('80.81.82.84', 'pool-1', '1234'),
-               FloatingIP.new('80.81.82.83', 'pool-1', nil)]
-            end
-            nova.stub(:allocate_floating_ip).with(env, 'pool-1') do
-              FloatingIP.new('80.81.82.85', 'pool-1', nil)
-            end
-            config.stub(:floating_ip_pool) { ['pool-1'] }
-            @action.resolve_floating_ip(env).should eq('80.81.82.85')
-          end
-        end
+  #   context 'with only one config.floating_ip_pool specified' do
+  #     context 'if an ip in the same pool is available' do
+  #       context 'with config.floating_ip_pool_always_allocate true' do
+  #         it 'allocate a new floating_ip from the pool' do
+  #           config.stub(:floating_ip_pool_always_allocate) { true }
+  #           nova.stub(:get_all_floating_ips).with(anything) do
+  #             [FloatingIP.new('80.81.82.84', 'pool-1', '1234'),
+  #              FloatingIP.new('80.81.82.83', 'pool-1', nil)]
+  #           end
+  #           nova.stub(:allocate_floating_ip).with(env, 'pool-1') do
+  #             FloatingIP.new('80.81.82.85', 'pool-1', nil)
+  #           end
+  #           config.stub(:floating_ip_pool) { ['pool-1'] }
+  #           @action.resolve_floating_ip(env).should eq('80.81.82.85')
+  #         end
+  #       end
 
-        context 'with config.floating_ip_pool_always_allocate false' do
-          it 'return one of the available ips' do
-            config.stub(:floating_ip_pool_always_allocate) { false }
-            nova.stub(:get_all_floating_ips).with(anything) do
-              [FloatingIP.new('80.81.82.84', 'pool-1', '1234'),
-               FloatingIP.new('80.81.82.83', 'pool-1', nil)]
-            end
-            config.stub(:floating_ip_pool) { ['pool-1'] }
-            @action.resolve_floating_ip(env).should eq('80.81.82.83')
-          end
-        end
-      end
+  #       context 'with config.floating_ip_pool_always_allocate false' do
+  #         it 'return one of the available ips' do
+  #           config.stub(:floating_ip_pool_always_allocate) { false }
+  #           nova.stub(:get_all_floating_ips).with(anything) do
+  #             [FloatingIP.new('80.81.82.84', 'pool-1', '1234'),
+  #              FloatingIP.new('80.81.82.83', 'pool-1', nil)]
+  #           end
+  #           config.stub(:floating_ip_pool) { ['pool-1'] }
+  #           @action.resolve_floating_ip(env).should eq('80.81.82.83')
+  #         end
+  #       end
+  #     end
 
-      context 'if no ip in the same pool is available' do
-        it 'allocate a new floating_ip from the pool' do
-          nova.stub(:get_all_floating_ips).with(anything) do
-            [FloatingIP.new('80.81.82.83', 'pool-1', '1234')]
-          end
-          nova.stub(:allocate_floating_ip).with(env, 'pool-1') do
-            FloatingIP.new('80.81.82.84', 'pool-1', nil)
-          end
-          config.stub(:floating_ip_pool) { ['pool-1'] }
-          @action.resolve_floating_ip(env).should eq('80.81.82.84')
-        end
-      end
-    end
+  #     context 'if no ip in the same pool is available' do
+  #       it 'allocate a new floating_ip from the pool' do
+  #         nova.stub(:get_all_floating_ips).with(anything) do
+  #           [FloatingIP.new('80.81.82.83', 'pool-1', '1234')]
+  #         end
+  #         nova.stub(:allocate_floating_ip).with(env, 'pool-1') do
+  #           FloatingIP.new('80.81.82.84', 'pool-1', nil)
+  #         end
+  #         config.stub(:floating_ip_pool) { ['pool-1'] }
+  #         @action.resolve_floating_ip(env).should eq('80.81.82.84')
+  #       end
+  #     end
+  #   end
 
-    context 'with several floating_ip_pool defined' do
-      context 'if an ip in a pool is available' do
-        context 'with config.floating_ip_pool_always_allocate true' do
-          it 'allocate a new floating_ip from the first pool defined' do
-            config.stub(:floating_ip_pool_always_allocate) { true }
-            nova.stub(:get_all_floating_ips).with(anything) do
-              [FloatingIP.new('80.81.82.84', 'pool-1', '1234'),
-               FloatingIP.new('80.81.82.83', 'pool-1', nil),
-               FloatingIP.new('80.81.82.82', 'pool-2', '5678')]
-            end
-            nova.stub(:allocate_floating_ip).with(env, 'pool-1') do
-              FloatingIP.new('80.81.82.85', 'pool-1', nil)
-            end
-            config.stub(:floating_ip_pool) { %w(pool-1 pool-2) }
-            @action.resolve_floating_ip(env).should eq('80.81.82.85')
-          end
-        end
+  #   context 'with several floating_ip_pool defined' do
+  #     context 'if an ip in a pool is available' do
+  #       context 'with config.floating_ip_pool_always_allocate true' do
+  #         it 'allocate a new floating_ip from the first pool defined' do
+  #           config.stub(:floating_ip_pool_always_allocate) { true }
+  #           nova.stub(:get_all_floating_ips).with(anything) do
+  #             [FloatingIP.new('80.81.82.84', 'pool-1', '1234'),
+  #              FloatingIP.new('80.81.82.83', 'pool-1', nil),
+  #              FloatingIP.new('80.81.82.82', 'pool-2', '5678')]
+  #           end
+  #           nova.stub(:allocate_floating_ip).with(env, 'pool-1') do
+  #             FloatingIP.new('80.81.82.85', 'pool-1', nil)
+  #           end
+  #           config.stub(:floating_ip_pool) { %w(pool-1 pool-2) }
+  #           @action.resolve_floating_ip(env).should eq('80.81.82.85')
+  #         end
+  #       end
 
-        context 'with config.floating_ip_pool_always_allocate false' do
-          it 'return one of the available ips' do
-            config.stub(:floating_ip_pool_always_allocate) { false }
-            nova.stub(:get_all_floating_ips).with(anything) do
-              [FloatingIP.new('80.81.82.84', 'pool-1', '1234'),
-               FloatingIP.new('80.81.82.83', 'pool-2', nil)]
-            end
-            config.stub(:floating_ip_pool) { %w(pool-1 pool-2) }
-            @action.resolve_floating_ip(env).should eq('80.81.82.83')
-          end
-        end
-      end
+  #       context 'with config.floating_ip_pool_always_allocate false' do
+  #         it 'return one of the available ips' do
+  #           config.stub(:floating_ip_pool_always_allocate) { false }
+  #           nova.stub(:get_all_floating_ips).with(anything) do
+  #             [FloatingIP.new('80.81.82.84', 'pool-1', '1234'),
+  #              FloatingIP.new('80.81.82.83', 'pool-2', nil)]
+  #           end
+  #           config.stub(:floating_ip_pool) { %w(pool-1 pool-2) }
+  #           @action.resolve_floating_ip(env).should eq('80.81.82.83')
+  #         end
+  #       end
+  #     end
 
-      context 'if no ip in the pools is available' do
-        context 'if allocate an ip in first pool is possible' do
-          it 'allocate a new floating_ip from first pool' do
-            nova.stub(:get_all_floating_ips).with(anything) do
-              [FloatingIP.new('80.81.82.83', 'pool-1', '1234'),
-               FloatingIP.new('80.81.82.82', 'pool-2', '5678')]
-            end
-            nova.stub(:allocate_floating_ip).with(env, 'pool-1') do
-              FloatingIP.new('80.81.82.84', 'pool-1', nil)
-            end
-            config.stub(:floating_ip_pool) { %w(pool-1 pool-2) }
-            @action.resolve_floating_ip(env).should eq('80.81.82.84')
-          end
-        end
+  #     context 'if no ip in the pools is available' do
+  #       context 'if allocate an ip in first pool is possible' do
+  #         it 'allocate a new floating_ip from first pool' do
+  #           nova.stub(:get_all_floating_ips).with(anything) do
+  #             [FloatingIP.new('80.81.82.83', 'pool-1', '1234'),
+  #              FloatingIP.new('80.81.82.82', 'pool-2', '5678')]
+  #           end
+  #           nova.stub(:allocate_floating_ip).with(env, 'pool-1') do
+  #             FloatingIP.new('80.81.82.84', 'pool-1', nil)
+  #           end
+  #           config.stub(:floating_ip_pool) { %w(pool-1 pool-2) }
+  #           @action.resolve_floating_ip(env).should eq('80.81.82.84')
+  #         end
+  #       end
 
-        context 'if allocate an ip in first pool is not possible' do
-          it 'allocate a new floating_ip from second pool' do
-            nova.stub(:get_all_floating_ips).with(anything) do
-              [FloatingIP.new('80.81.82.83', 'pool-1', '1234'),
-               FloatingIP.new('80.81.82.82', 'pool-2', '5678')]
-            end
-            nova.stub(:allocate_floating_ip).with(env, 'pool-1').and_raise Errors::VagrantOpenstackError, message: 'error', code: 404
-            nova.stub(:allocate_floating_ip).with(env, 'pool-2') do
-              FloatingIP.new('80.81.82.84', 'pool-2', nil)
-            end
-            config.stub(:floating_ip_pool) { %w(pool-1 pool-2) }
-            @action.resolve_floating_ip(env).should eq('80.81.82.84')
-          end
-        end
+  #       context 'if allocate an ip in first pool is not possible' do
+  #         it 'allocate a new floating_ip from second pool' do
+  #           nova.stub(:get_all_floating_ips).with(anything) do
+  #             [FloatingIP.new('80.81.82.83', 'pool-1', '1234'),
+  #              FloatingIP.new('80.81.82.82', 'pool-2', '5678')]
+  #           end
+  #           nova.stub(:allocate_floating_ip).with(env, 'pool-1').and_raise Errors::VagrantOpenstackError, message: 'error', code: 404
+  #           nova.stub(:allocate_floating_ip).with(env, 'pool-2') do
+  #             FloatingIP.new('80.81.82.84', 'pool-2', nil)
+  #           end
+  #           config.stub(:floating_ip_pool) { %w(pool-1 pool-2) }
+  #           @action.resolve_floating_ip(env).should eq('80.81.82.84')
+  #         end
+  #       end
 
-        context 'if allocate an ip in either first and second pool is not possible' do
-          it 'shoud raise an error', :simon do
-            nova.stub(:get_all_floating_ips).with(anything) do
-              [FloatingIP.new('80.81.82.83', 'pool-1', '1234'),
-               FloatingIP.new('80.81.82.82', 'pool-2', '5678')]
-            end
-            nova.stub(:allocate_floating_ip).with(env, 'pool-1').and_raise Errors::VagrantOpenstackError, message: 'error', code: 404
-            nova.stub(:allocate_floating_ip).with(env, 'pool-2').and_raise Errors::VagrantOpenstackError, message: 'error', code: 404
-            config.stub(:floating_ip_pool) { %w(pool-1 pool-2) }
-            expect { @action.resolve_floating_ip(env) }.to raise_error(Errors::VagrantOpenstackError)
-          end
-        end
-      end
-    end
+  #       context 'if allocate an ip in either first and second pool is not possible' do
+  #         it 'shoud raise an error', :simon do
+  #           nova.stub(:get_all_floating_ips).with(anything) do
+  #             [FloatingIP.new('80.81.82.83', 'pool-1', '1234'),
+  #              FloatingIP.new('80.81.82.82', 'pool-2', '5678')]
+  #           end
+  #           nova.stub(:allocate_floating_ip).with(env, 'pool-1').and_raise Errors::VagrantOpenstackError, message: 'error', code: 404
+  #           nova.stub(:allocate_floating_ip).with(env, 'pool-2').and_raise Errors::VagrantOpenstackError, message: 'error', code: 404
+  #           config.stub(:floating_ip_pool) { %w(pool-1 pool-2) }
+  #           expect { @action.resolve_floating_ip(env) }.to raise_error(Errors::VagrantOpenstackError)
+  #         end
+  #       end
+  #     end
+  #   end
 
-    context 'with neither floating_ip nor floating_ip_pool' do
-      it 'fails with an UnableToResolveFloatingIP error' do
-        config.stub(:floating_ip) { nil }
-        config.stub(:floating_ip_pool) { nil }
-        expect { @action.resolve_floating_ip(env) }.to raise_error(Errors::UnableToResolveFloatingIP)
-      end
-    end
-  end
+  #   context 'with neither floating_ip nor floating_ip_pool' do
+  #     it 'fails with an UnableToResolveFloatingIP error' do
+  #       config.stub(:floating_ip) { nil }
+  #       config.stub(:floating_ip_pool) { nil }
+  #       expect { @action.resolve_floating_ip(env) }.to raise_error(Errors::UnableToResolveFloatingIP)
+  #     end
+  #   end
+  # end
 
   describe 'resolve_keypair' do
     context 'with keypair_name provided' do
