@@ -43,7 +43,7 @@ module VagrantPlugins
       end
 
       def to_s
-        'ConoHa provider'
+        'Vagrant ConoHa provider'
       end
     end
   end

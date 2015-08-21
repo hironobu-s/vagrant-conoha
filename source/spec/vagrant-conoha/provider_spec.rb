@@ -7,7 +7,7 @@ describe VagrantPlugins::ConoHa::Provider do
 
   describe 'to string' do
     it 'should give the provider name' do
-      @provider.to_s.should eq('ConoHa')
+      @provider.to_s.should eq('Vagrant ConoHa provider')
     end
   end
 end
