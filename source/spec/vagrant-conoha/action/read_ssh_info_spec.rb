@@ -14,8 +14,6 @@ describe VagrantPlugins::ConoHa::Action::ReadSSHInfo do
       config.stub(:username) { 'username' }
       config.stub(:password) { 'password' }
       config.stub(:ssh_username) { 'test_username' }
-      config.stub(:floating_ip) { nil }
-      config.stub(:floating_ip_pool) { nil }
       config.stub(:keypair_name) { nil }
       config.stub(:public_key_path) { nil }
       config.stub(:ssh_disabled) { false }
@@ -30,7 +28,8 @@ describe VagrantPlugins::ConoHa::Action::ReadSSHInfo do
             'net' => [
               {
                 'addr' => '80.80.80.80',
-                'OS-EXT-IPS:type' => 'floating'
+                'OS-EXT-IPS:type' => 'fixed',
+                'version' => 4
               }
             ]
           }
@@ -177,7 +176,8 @@ describe VagrantPlugins::ConoHa::Action::ReadSSHInfo do
                 'addr' => '13.13.13.13'
               }, {
                 'addr' => '12.12.12.12',
-                'OS-EXT-IPS:type' => 'floating'
+                'OS-EXT-IPS:type' => 'fixed',
+                'version' => 4
               }]
             }
           }
