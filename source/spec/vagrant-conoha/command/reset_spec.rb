@@ -16,7 +16,7 @@ describe VagrantPlugins::ConoHa::Command::Reset do
     end
 
     it 'resets vagrant openstack machines' do
-      expect(env[:ui]).to receive(:info).with('Vagrant OpenStack Provider has been reset')
+      expect(env[:ui]).to receive(:info).with('Vagrant ConoHa has been reset.')
       expect(FileUtils).to receive(:remove_dir).with('/my/data/dir')
       @reset_cmd.cmd('reset', [], env)
     end
