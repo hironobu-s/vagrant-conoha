@@ -67,7 +67,6 @@ describe VagrantPlugins::ConoHa::Action::CreateServer do
         [{ id: 'vol-01', device: nil }]
       end
       r.stub(:resolve_keypair).with(anything) { 'key' }
-      r.stub(:resolve_floating_ip).with(anything) { '1.2.3.4' }
       r.stub(:resolve_security_groups).with(anything) do
         [{ name: 'group1' }, { name: 'group2' }]
       end
@@ -105,13 +104,11 @@ describe VagrantPlugins::ConoHa::Action::CreateServer do
     context 'with full options' do
       it 'works' do
         allow(@action).to receive(:create_server).and_return('45678')
-        allow(@action).to receive(:assign_floating_ip).and_return('1.2.3.4')
         allow(@action).to receive(:waiting_for_server_to_be_built)
         allow(@action).to receive(:attach_volumes)
         allow(@action).to receive(:waiting_for_server_to_be_reachable)
 
         expect(@action).to receive(:waiting_for_server_to_be_built).with(env, '45678')
-        expect(@action).to receive(:assign_floating_ip).with(env, '45678').and_return('1.2.3.4')
         expect(@action).to receive(:attach_volumes).with(env, '45678', [{ id: 'vol-01', device: nil }])
 
         @action.call(env)
@@ -210,36 +207,6 @@ describe VagrantPlugins::ConoHa::Action::CreateServer do
         nova.should_receive(:get_server_details).with(env, 'server-01').exactly(2).times
         config.stub(:server_create_timeout) { 3 }
         expect { @action.waiting_for_server_to_be_built(env, 'server-01', 1) }.to raise_error Errors::ServerStatusError
-      end
-    end
-  end
-
-  describe 'assign_floating_ip' do
-    context 'When resolve correctly floating ip' do
-      it 'calls nova to assign floating ip' do
-        resolver.stub(:resolve_floating_ip).and_return '1.2.3.4'
-        nova.stub(:add_floating_ip)
-        expect(resolver).to receive(:resolve_floating_ip).with(env)
-        expect(nova).to receive(:add_floating_ip).with(env, 'server-01', '1.2.3.4')
-        @action.assign_floating_ip(env, 'server-01')
-      end
-    end
-    context 'When unable to resolve floating ip' do
-      it 'does not fail' do
-        resolver.stub(:resolve_floating_ip).and_raise Errors::UnableToResolveFloatingIP
-        nova.stub(:add_floating_ip)
-        expect(resolver).to receive(:resolve_floating_ip).with(env)
-        expect(nova).to_not receive(:add_floating_ip)
-        @action.assign_floating_ip(env, 'server-01')
-      end
-    end
-    context 'When neither floating ip nor floating ip pool is configured' do
-      it 'does nothing' do
-        resolver.stub(:resolve_floating_ip).and_return nil
-        nova.stub(:add_floating_ip)
-        expect(resolver).to receive(:resolve_floating_ip).with(env)
-        expect(nova).to_not receive(:add_floating_ip)
-        @action.assign_floating_ip(env, 'server-01')
       end
     end
   end
