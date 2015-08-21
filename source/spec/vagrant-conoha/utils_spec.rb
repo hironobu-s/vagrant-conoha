@@ -44,7 +44,8 @@ describe VagrantPlugins::ConoHa::Utils do
                   'addr' => '13.13.13.13'
                 }, {
                   'addr' => '12.12.12.12',
-                  'OS-EXT-IPS:type' => 'floating'
+                  'OS-EXT-IPS:type' => 'fixed',
+                  'version' => 4
                 }]
               }
             }
