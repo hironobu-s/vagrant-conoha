@@ -1,7 +1,7 @@
 en:
   vagrant_openstack:
     global_error: |-
-      An unknown error happened in Vagrant OpenStack provider
+      An unknown error happened in Vagrant ConoHa plugin
 
       To easily debug what happened, we recommend to set the environment
       variable VAGRANT_OPENSTACK_LOG to debug
@@ -10,25 +10,25 @@ en:
 
       If doing this does not help fixing your issue, there may be a bug
       in the provider. Please submit an issue on Github at
-      https://github.com/ggiamarchi/vagrant-openstack-provider
+      https://github.com/hironobu-s/vagrant-conoha
       with the stracktrace and the logs.
 
       We are looking for feedback, so feel free to ask questions or
       describe features you would like to see in this provider.
     version_outdated: |-
-      You're not using the latest version of the 'vagrant-openstack-provider' plugin.
+      You're not using the latest version of the 'vagrant-conoha' plugin.
       The latest version is %{latest}, yours is %{current}. You should update to the latest
       version running the command :
 
-          $ vagrant plugin update vagrant-openstack-provider
+          $ vagrant plugin update vagrant-conoha
     version_unstable: |-
-      You're not running a stable version of the 'vagrant-openstack-provider' plugin.
+      You're not running a stable version of the 'vagrant-conoha' plugin.
       Unless you are either developing on vagrant or have deliberatly installed a not
       stable version, you should uninstall it an install the latest stable version
       running commands :
 
-          $ vagrant plugin uninstall vagrant-openstack-provider
-          $ vagrant plugin install vagrant-openstack-provider
+          $ vagrant plugin uninstall vagrant-conoha
+          $ vagrant plugin install vagrant-conoha
     already_created: |-
       The server is already created.
     create_stack: |-
@@ -84,7 +84,7 @@ en:
     waiting_for_stack_deleted: |-
       Waiting for Heat Stack to be created...
     warn_networks: |-
-      Warning! The OpenStack provider doesn't support any of the Vagrant
+      Warning! This provider doesn't support any of the Vagrant
       high-level network configurations (`config.vm.network`). They
       will be silently ignored.
     warn_network_identifier_is_assumed_to_be_an_id: |-
@@ -120,14 +120,14 @@ en:
         Metadata must be a hash.
       keypair_name_required: |-
         Warning! You have specified ssh.private_key_path in your Vagrant configuration.
-        but nor keypair_name neither public_key_path are present. The OpenStack provider
+        but nor keypair_name neither public_key_path are present. This provider
         will automatically generate a new keypair and your configuration option
         ssh.private_key_path will be overriden
       private_key_missing: |-
         config.ssh.private_key_path is required when either keypair_name or
         public_key_path is set in Vagrantfile
       ssh_username_deprecated: |-
-        ssh_username provider config is deprecated for vagrant-openstack provider.
+        ssh_username provider config is deprecated for vagrant-conoha.
         If you are using it, it will continue to work but we recommend to switch to the
         standard vagrant configuration option `config.ssh.username` instead
       ssh_username_required: |-
@@ -372,7 +372,7 @@ en:
 
     command:
       main_synopsis: |-
-        OpenStack provider specific commands
+        this provider specific commands
       main_usage : |-
         Usage: vagrant openstack command
       available_subcommands: |-
@@ -390,4 +390,4 @@ en:
       volume_list_synopsis : |-
         List existing volumes
       reset : |-
-        Reset Vagrant OpenStack provider to a clear state
+        Reset provider to a clear state
