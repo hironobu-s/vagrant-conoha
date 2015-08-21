@@ -17,7 +17,7 @@ module VagrantPlugins
       end
 
       def get_all_volumes(env)
-        volumes_json = get(env, "#{@session.endpoints[:volume]}/volumes/detail")
+        volumes_json = get(env, "#{@session.endpoints[:volumev2]}/volumes/detail")
         JSON.parse(volumes_json)['volumes'].map do |volume|
           name = volume['display_name']
           name = volume['name'] if name.nil? # To be compatible with cinder api v1 and v2
