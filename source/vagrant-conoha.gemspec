@@ -5,11 +5,11 @@ require 'vagrant-conoha/version'
 Gem::Specification.new do |gem|
   gem.name          = 'vagrant-conoha'
   gem.version       = VagrantPlugins::ConoHa::VERSION
-  gem.authors       = ['Guillaume Giamarchi', 'Julien Vey']
-  gem.email         = ['guillaume.giamarchi@gmail.com', 'vey.julien@gmail.com']
-  gem.description   = 'Enables Vagrant to manage machines in OpenStack Cloud.'
-  gem.summary       = 'Enables Vagrant to manage machines in OpenStack Cloud.'
-#  gem.homepage      = 'https://github.com/ggiamarchi/vagrant-openstack-provider'
+  gem.authors       = ['Hironobu Saitoh']
+  gem.email         = ['hiro@hironobu.org']
+  gem.description   = 'Enables Vagrant to manage VPS in ConoHa. (forked from github.com/ggiamarchi/vagrant-openstack-provider)'
+  gem.summary       = 'Enables Vagrant to manage VPS in ConoHa. (forked from github.com/ggiamarchi/vagrant-openstack-provider)'
+  gem.homepage      = 'https://github.com/hironobu-s/vagrant-conoha/'
   gem.license       = 'MIT'
 
   gem.add_dependency 'json', '1.7.7'
