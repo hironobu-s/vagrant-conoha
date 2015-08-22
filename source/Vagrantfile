@@ -1,20 +1,71 @@
-require 'vagrant-openstack-provider'
+# coding: utf-8
 
-Vagrant.configure('2') do |config|
+# プラグインの設定を行います。おもにConoHa APIに関するものです。
+# コントロールパネルの「API」ページに必要情報があります。
+# https://manage.conoha.jp/API/
 
-  config.vm.box = 'openstack'
+# Vagrantfile API/syntax version. Don't touch unless you know what you're doing!
+VAGRANTFILE_API_VERSION = "2"
 
-  config.ssh.username = ENV['OS_SSH_USERNAME']
+Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
+  config.vm.box       = 'conoha'
+  config.ssh.username = 'root'
 
-  config.vm.provider :openstack do |os|
-    os.openstack_auth_url    = ENV['OS_AUTH_URL']
-    os.tenant_name           = ENV['OS_TENANT_NAME']
-    os.username              = ENV['OS_USERNAME']
-    os.password              = ENV['OS_PASSWORD']
-    os.floating_ip_pool      = ENV['OS_FLOATING_IP_POOL']
-    os.flavor                = ENV['OS_FLAVOR']
-    os.image                 = ENV['OS_IMAGE']
+  config.vm.provider :conoha do |conoha|
+
+    # IdentityEndpointを指定します。
+    conoha.openstack_auth_url = 'https://identity.tyo1.conoha.io/v2.0'
+
+    # APIユーザ名、APIパスワード、テナント名を指定します。
+    # APIユーザー名はgncu、テナント名はgnctなので注意して下さい。
+    conoha.username           = 'gncu*******'
+    conoha.password           = '***********'
+    conoha.tenant_name        = 'gnct*******'
+
+    # VPSのスペックを指定します(g-1gbの場合は1GBプランになります)。
+    #
+    # 指定できる値はvagrantのopenstackコマンドで取得できます。
+    # 以下のコマンドを実行してname列に表示された値を指定します。
+    #
+    # vagrant openstack flavor-list
+    conoha.flavor             = 'g-1gb'
+
+    # VPSのイメージを指定します。
+    #
+    # 指定できる値はvagrantのopenstackコマンドで取得できます。
+    # 以下のコマンドを実行してname列に表示された値を指定します。
+    #
+    # vagrant openstack image-list
+    conoha.image              = 'gncvmi-ubuntu-14.04-amd64'
+
+    # リージョンを指定します。
+    # tyo1 sin1 sjc1のどれかです。
+    conoha.region             = "tyo1"
+
+    # VPSのネームタグを指定します。
+    conoha.metadata           = {
+      instance_name_tag: "vagrant_conoha"
+    }
+
+    # セキュリティグループを指定します。
+    # NOTE: VPSを一度も作成したことがない場合は、defaultが存在しないことがあります。
+    conoha.security_groups    = [
+      "default",
+      "gncs-ipv4-all",
+      "gncs-ipv6-all"
+    ]
+
+    # SSH公開鍵を指定します。
+    # コントロールパネルの「SSH Key」にある名前を指定して下さい。
+    # config.ssh.private_key_pathもともに指定する必要があります。
+    #
+    # 指定が無い場合は、Vagrantが新しい鍵ペアを作成します。
+    # conoha.keypair_name       = "hironobu-key"
+
   end
 
-  config.vm.provision "shell", inline: "echo 'ok' > ~/provision"
+  # すでにSSH公開鍵をコントロールパネルに登録している場合は、
+  # ここで秘密鍵のパスを指定します。
+  # keypair_nameとともに指定します。
+  # config.ssh.private_key_path = "~/.ssh/id_rsa"
 end
