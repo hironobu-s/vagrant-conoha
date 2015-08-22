@@ -7,8 +7,8 @@ Gem::Specification.new do |gem|
   gem.version       = VagrantPlugins::ConoHa::VERSION
   gem.authors       = ['Hironobu Saitoh']
   gem.email         = ['hiro@hironobu.org']
-  gem.description   = 'Enables Vagrant to manage VPS in ConoHa. (forked from github.com/ggiamarchi/vagrant-openstack-provider)'
-  gem.summary       = 'Enables Vagrant to manage VPS in ConoHa. (forked from github.com/ggiamarchi/vagrant-openstack-provider)'
+  gem.description   = 'Enables Vagrant to manage VPS in ConoHa.'
+  gem.summary       = 'Enables Vagrant to manage VPS in ConoHa.'
   gem.homepage      = 'https://github.com/hironobu-s/vagrant-conoha/'
   gem.license       = 'MIT'
 
