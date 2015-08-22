@@ -36,7 +36,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
     # 以下のコマンドを実行してname列に表示された値を指定します。
     #
     # vagrant openstack image-list
-    conoha.image              = 'gncvmi-ubuntu-14.04-amd64'
+    conoha.image              = 'vmi-ubuntu-14.04-amd64'
 
     # リージョンを指定します。
     # tyo1 sin1 sjc1のどれかです。
