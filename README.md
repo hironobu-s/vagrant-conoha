@@ -45,6 +45,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
     conoha.flavor             = 'g-1gb'
     conoha.image              = 'gncvmi-ubuntu-14.04-amd64'
     conoha.region             = "tyo1"
+    conoha.admin_pass         = "AdminPass123*"
     conoha.metadata           = {
       instance_name_tag: "vagrant_conoha"
     }

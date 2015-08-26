@@ -42,6 +42,11 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
     # tyo1 sin1 sjc1のどれかです。
     conoha.region             = "tyo1"
 
+    # VPSのrootパスワードを設定します。
+    # 空文字の場合はパスワードは設定されません
+    # (コンソールログイン不可になります)
+    conoha.admin_pass         = ""
+
     # VPSのネームタグを指定します。
     conoha.metadata           = {
       instance_name_tag: "vagrant_conoha"
