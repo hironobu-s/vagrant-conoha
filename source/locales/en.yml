@@ -134,6 +134,8 @@ en:
         vagrant standard configuration option `ssh.username` is required
       invalid_value_for_parameter: |-
         Invalid value '%{value}' for parameter '%{parameter}'
+      invalid_admin_pass: |-
+        admin_pass must be contain at least 9 characters, least 1 number and both lower and uppercase letters, and specialcharacters.
 
     errors:
       default: |-

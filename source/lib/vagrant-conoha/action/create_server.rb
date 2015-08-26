@@ -36,6 +36,7 @@ module VagrantPlugins
             networks: @resolver.resolve_networks(env),
             volumes: @resolver.resolve_volumes(env),
             keypair_name: @resolver.resolve_keypair(env),
+            admin_pass: env[:machine].provider_config.admin_pass,
             availability_zone: env[:machine].provider_config.availability_zone,
             scheduler_hints: env[:machine].provider_config.scheduler_hints,
             security_groups: @resolver.resolve_security_groups(env),
@@ -119,6 +120,7 @@ module VagrantPlugins
             networks: options[:networks],
             scheduler_hints: options[:scheduler_hints],
             security_groups: options[:security_groups],
+            admin_pass: options[:admin_pass],
             user_data: options[:user_data],
             metadata: options[:metadata]
           }

@@ -146,7 +146,7 @@ describe VagrantPlugins::ConoHa::NovaClient do
         it 'returns new instance id' do
           stub_request(:post, 'http://nova/a1b2c3/servers')
             .with(
-              body: '{"server":{"name":"inst","imageRef":"img","flavorRef":"flav","key_name":"key",'\
+              body: '{"server":{"name":"inst","imageRef":"img","flavorRef":"flav","key_name":"key","adminPass":"AdminPass123%",'\
               '"security_groups":[{"name":"default"}],"user_data":"dXNlcl9kYXRhX3Rlc3Q=\n","metadata":"metadata_test"},'\
               '"os:scheduler_hints":"sched_hints_test"}',
               headers:
@@ -162,6 +162,7 @@ describe VagrantPlugins::ConoHa::NovaClient do
             name: 'inst',
             image_ref: 'img',
             flavor_ref: 'flav',
+            admin_pass: 'AdminPass123%',
             networks: nil,
             keypair: 'key',
             security_groups: [{ name: 'default' }],

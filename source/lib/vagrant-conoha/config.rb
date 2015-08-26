@@ -67,6 +67,11 @@ module VagrantPlugins
       # @return [String]
       attr_accessor :keypair_name
 
+      # The unix root password of OpenStack instance.
+      #
+      # @return [String]
+      attr_accessor :admin_pass
+
       # The SSH username to use with this OpenStack instance. This overrides
       # the `config.ssh.username` variable.
       #
@@ -213,6 +218,7 @@ module VagrantPlugins
         @rsync_includes = []
         @rsync_ignore_files = []
         @keypair_name = UNSET_VALUE
+        @admin_pass   = UNSET_VALUE
         @ssh_username = UNSET_VALUE
         @ssh_timeout = UNSET_VALUE
         @floating_ip = UNSET_VALUE
@@ -300,6 +306,7 @@ module VagrantPlugins
         @floating_ip_pool_always_allocate = false if floating_ip_pool_always_allocate == UNSET_VALUE
         @sync_method = 'rsync' if @sync_method == UNSET_VALUE
         @keypair_name = nil if @keypair_name == UNSET_VALUE
+        @admin_pass = nil if @admin_pass == UNSET_VALUE
         @public_key_path = nil if @public_key_path == UNSET_VALUE
         @availability_zone = nil if @availability_zone == UNSET_VALUE
         @scheduler_hints = nil if @scheduler_hints == UNSET_VALUE
@@ -340,6 +347,7 @@ module VagrantPlugins
         validate_ssh_username(machine, errors)
         validate_stack_config(errors)
         validate_ssh_timeout(errors)
+        validate_admin_pass(errors)
 
         if machine.config.ssh.private_key_path
           puts I18n.t('vagrant_openstack.config.keypair_name_required').yellow unless @keypair_name || @public_key_path
@@ -362,6 +370,13 @@ module VagrantPlugins
       end
 
       private
+
+      def validate_admin_pass(errors)
+        return if @admin_pass == '' or @admin_pass == nil
+
+        reg = /\A(?=.*?[A-Z])(?=.*?[a-z])(?=.*?\d)(?=.*?[!-~&&[^A-Za-z\d]])[!-~]{9,70}+\z/
+        errors << I18n.t('vagrant_openstack.config.invalid_admin_pass') unless @admin_pass =~ reg
+      end
 
       def validate_stack_config(errors)
         @stacks.each do |stack|

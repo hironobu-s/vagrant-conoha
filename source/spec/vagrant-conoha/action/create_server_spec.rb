@@ -17,6 +17,7 @@ describe VagrantPlugins::ConoHa::Action::CreateServer do
       config.stub(:scheduler_hints) { nil }
       config.stub(:security_groups) { nil }
       config.stub(:user_data) { nil }
+      config.stub(:admin_pass) { "TestPassword1234*" }
       config.stub(:metadata) { nil }
     end
   end
@@ -131,6 +132,7 @@ describe VagrantPlugins::ConoHa::Action::CreateServer do
           scheduler_hints: 'test-sched-hints',
           security_groups: ['test-sec-groups'],
           user_data: 'test-user_data',
+          admin_pass: 'TestPassword1234*',
           metadata: 'test-metadata') do
           '1234'
         end
@@ -145,6 +147,7 @@ describe VagrantPlugins::ConoHa::Action::CreateServer do
           scheduler_hints: 'test-sched-hints',
           security_groups: ['test-sec-groups'],
           user_data: 'test-user_data',
+          admin_pass: 'TestPassword1234*',
           metadata: 'test-metadata'
         }
 
@@ -166,6 +169,7 @@ describe VagrantPlugins::ConoHa::Action::CreateServer do
           scheduler_hints: nil,
           security_groups: [],
           user_data: nil,
+          admin_pass: nil,
           metadata: nil) do
           '1234'
         end
@@ -180,6 +184,7 @@ describe VagrantPlugins::ConoHa::Action::CreateServer do
           scheduler_hints: nil,
           security_groups: [],
           user_data: nil,
+          admin_pass: nil,
           metadata: nil
         }
 
