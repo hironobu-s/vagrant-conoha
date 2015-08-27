@@ -1,7 +1,7 @@
 # vagrant-conoha
 
 [![Gem Version](https://badge.fury.io/rb/vagrant-conoha.svg)](http://badge.fury.io/rb/vagrant-conoha)
-
+[![Dependency Status](https://gemnasium.com/hironobu-s/vagrant-conoha.svg)](https://gemnasium.com/hironobu-s/vagrant-conoha)
 [![Build Status](https://travis-ci.org/hironobu-s/vagrant-conoha.svg)](https://travis-ci.org/hironobu-s/vagrant-conoha)
 
 [Vagrant](Vagrant ConoHa Provider)1.2以降で使える、[ConoHa](https://www.conoha.jp/)用のProviderです。
@@ -73,13 +73,12 @@ $ vagrant up --provider=conoha
 
 ## 詳細
 
-後で書く
-
+あとで(˙꒳˙)
 
 ## サポート
 
-このプラグインは非公式です。ConoHaのサポートなどへの問い合わせはご遠慮ください。
-作者はConoHaの中の人なのでissueで聞いて下さい(˙꒳˙)
+このプラグインは非公式ですので、ConoHaのサポートなどへの問い合わせはご遠慮ください。
+作者はConoHaの中の人なので、issueとかでお気軽にどうぞ(˙꒳˙)
 
 ## ライセンス
 
