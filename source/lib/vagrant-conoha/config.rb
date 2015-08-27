@@ -372,7 +372,7 @@ module VagrantPlugins
       private
 
       def validate_admin_pass(errors)
-        return if @admin_pass == '' or @admin_pass == nil
+        return if @admin_pass == '' || @admin_pass.nil?
 
         reg = /\A(?=.*?[A-Z])(?=.*?[a-z])(?=.*?\d)(?=.*?[!-~&&[^A-Za-z\d]])[!-~]{9,70}+\z/
         errors << I18n.t('vagrant_openstack.config.invalid_admin_pass') unless @admin_pass =~ reg

@@ -17,7 +17,7 @@ describe VagrantPlugins::ConoHa::Action::CreateServer do
       config.stub(:scheduler_hints) { nil }
       config.stub(:security_groups) { nil }
       config.stub(:user_data) { nil }
-      config.stub(:admin_pass) { "TestPassword1234*" }
+      config.stub(:admin_pass) { 'TestPassword1234*' }
       config.stub(:metadata) { nil }
     end
   end
