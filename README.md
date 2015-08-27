@@ -26,7 +26,7 @@ VagrantからConoHaにup, destroyやsshなどのコマンドを使用したり�
 $ vagrant plugin install vagrant-conoha
 ```
 
-次に以下の内容でVagrantfileを作成します。コメント入りは[こちら](https://github.com/hironobu-s/vagrant-conoha/blob/master/source/Vagrantfile)
+次に以下の内容でVagrantfileを作成します。各パラメータの解説は[こちら](https://github.com/hironobu-s/vagrant-conoha/blob/master/source/Vagrantfile)
 
 ```ruby
 VAGRANTFILE_API_VERSION = "2"
@@ -43,7 +43,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
     conoha.tenant_name        = 'gnct*******'
 
     conoha.flavor             = 'g-1gb'
-    conoha.image              = 'gncvmi-ubuntu-14.04-amd64'
+    conoha.image              = 'vmi-ubuntu-14.04-amd64'
     conoha.region             = "tyo1"
     conoha.admin_pass         = "AdminPass123*"
     conoha.metadata           = {
