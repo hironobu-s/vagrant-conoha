@@ -73,12 +73,13 @@ $ vagrant up --provider=conoha
 
 ## 詳細
 
-あとで(˙꒳˙)
+下記URLをご覧下さい。
+[VagrantからConoHaを使う - Qiita](http://qiita.com/hironobu_s/items/8422a427fd5571747196)
 
 ## サポート
 
 このプラグインは非公式ですので、ConoHaのサポートなどへの問い合わせはご遠慮ください。
-作者はConoHaの中の人なので、issueとかでお気軽にどうぞ(˙꒳˙)
+作者はConoHaの中の人なので、issueとかでお気軽にどうぞ( ´ ω ` )
 
 ## ライセンス
 
