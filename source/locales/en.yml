@@ -67,6 +67,8 @@ en:
       Trying authentication...
     rsync_folder: |-
       Rsyncing folder: %{hostpath} => %{guestpath}
+    confirm_rsync_installed: |-
+      Installing rsync...
     using_floating_ip: |-
       Using floating IP %{floating_ip}
     waiting_for_build: |-

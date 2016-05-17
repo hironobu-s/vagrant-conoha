@@ -1,7 +1,6 @@
 require 'log4r'
 require 'rbconfig'
 require 'vagrant/util/subprocess'
-
 require 'vagrant-conoha/action/abstract_action'
 
 module VagrantPlugins
@@ -56,6 +55,8 @@ module VagrantPlugins
 
           config          = env[:machine].provider_config
           rsync_includes  = config.rsync_includes.to_a
+
+          confirm_rsync_installed(env)
 
           env[:machine].config.vm.synced_folders.each do |_, data|
             hostpath  = File.expand_path(data[:hostpath], env[:root_path])
@@ -112,6 +113,24 @@ module VagrantPlugins
         end
 
         private
+
+        def confirm_rsync_installed(env)
+          # Install rsync if not installed
+          r = env[:machine].communicate.execute('which rsync', {error_check: false})
+          if r  == 0
+            return
+          end
+
+          config = env[:machine].provider_config
+
+          if config.image =~ /debian|ubuntu/
+            env[:ui].detail(I18n.t('vagrant_openstack.confirm_rsync_installed'))
+            env[:machine].communicate.sudo('apt-get update && apt-get install -y rsync')
+          elsif config.image =~ /centos/
+            env[:ui].detail(I18n.t('vagrant_openstack.confirm_rsync_installed'))
+            env[:machine].communicate.sudo('yum -y install rsync')
+          end
+        end
 
         def ssh_key_options(ssh_info)
           # Ensure that `private_key_path` is an Array (for Vagrant < 1.4)
