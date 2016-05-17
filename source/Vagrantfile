@@ -1,94 +1,143 @@
-# -*- mode: ruby -*-
-# vi: set ft=ruby :
-
-$script= <<SCRIPT
+# coding: utf-8
 
 #
-# Do not exec script again on a vagrant reprovision
+# vagrant-conoha
 #
-if [ -e /var/lib/vagrant/provisionning/ok ] ; then
-  exit 0
-fi
-
-LOG=/tmp/provisionning.log
-
-title() {
-    echo ""
-    echo "##################################################################"
-    echo " $1"
-    echo "##################################################################"
-    echo ""
-}
-
-run() {
-  if [ ! -z "$1" ] ; then
-    echo "==> $1"
-    title "$1" >> $LOG
-  fi
-  shift
-  $* >> $LOG 2>&1
-  if [ $? -ne 0 ] ; then
-    echo "ERROR... See log in $LOG on the vagrant machine" >&2
-    exit 1
-  fi
-}
-
-install() {
-  run "Add multiverse repository" sudo add-apt-repository multiverse
-  run "Update apt repositories metadata" sudo apt-get update
-  run "Install Git" sudo apt-get install -y git
-  run "Install Ruby" sudo apt-get install -y ruby1.9.3
-  run "" sudo ln -sf /usr/bin/ruby1.9.3 /etc/alternatives/ruby
-  run "" sudo ln -sf /usr/bin/gem1.9.3 /etc/alternatives/gem
-  run "Install Bundler" sudo gem install bundler
-  run "Install Appraisal" sudo gem install appraisal
-  run "Install VirtualBox" sudo apt-get install -y virtualbox
-}
-
-runTests() {
-  run "" cd /vagrant-openstack
-  run "Run 'bundle update'" bundle update
-  run "Run 'bundle install'" bundle install
-  run "Run 'bundle exec rake" bundle exec rake
-  #run "Run 'appraisal install'" appraisal install
-  #run "Run 'appraisal rake'" appraisal rake
-  run "Finished"
-}
-
+# プラグインの設定を行います。おもにConoHa APIに関するものです。
+# コントロールパネルの「API」ページに必要情報があります。
+# https://manage.conoha.jp/API/
 #
-# Flag provisionning finished without any error
-#
-finish() {
-  run "" mkdir -p /var/lib/vagrant/provisionning
-  run "" touch /var/lib/vagrant/provisionning/ok
-  #TODO(julienvey) generate private key with ssh-keygen
-  run "" export RESTCLIENT_LOG=stdout
-}
 
-# Main script
-install
-runTests
-finish
+# Vagrantfile API/syntax version. Don't touch unless you know what you're doing!
+VAGRANTFILE_API_VERSION = "2"
 
-exit 0
+Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
 
-SCRIPT
+  # このプラグインではConoHa(OpenStack)のイメージを使用するため、boxは利用できません。
+  # このパラメータを変更する必要はありません。
+  config.vm.box       = 'conoha'
 
-Vagrant.configure("2") do |config|
+  # vagrantがSSH接続する際のユーザ名を指定します。
+  config.ssh.username = 'root'
 
-  config.vm.box = "trusty64"
-  config.vm.box_url = "http://cloud-images.ubuntu.com/vagrant/trusty/current/trusty-server-cloudimg-amd64-vagrant-disk1.box"
+  config.vm.provider :conoha do |conoha|
 
-  config.vm.network "private_network", ip: "192.168.40.30"
+    # IdentityEndpointを指定します
+    # 東京以外のリージョンを利用する場合は変更して下さい。
+    conoha.openstack_auth_url = 'https://identity.tyo1.conoha.io/v2.0'
 
-  config.vm.provider :virtualbox do |vb|
-    vb.name = "ruby-env-dev"
-    vb.customize ["modifyvm", :id, "--cpus", "1"]
-    vb.customize ["modifyvm", :id, "--memory", "1024"]
+    # APIユーザ名、APIパスワード、テナント名を指定します。
+    # APIユーザー名はgncu、テナント名はgnctなので注意して下さい。
+    conoha.username           = 'gncu*******'
+    conoha.password           = '***********'
+    conoha.tenant_name        = 'gnct*******'
+
+    # VPSのスペックを指定します(g-1gbの場合は1GBプランになります)。
+    # 2015/08/27現在、以下のプランが利用可能です。
+    #
+    # g-1gb
+    # g-2gb
+    # g-4gb
+    # g-8gb
+    # g-16gb
+    # g-32gb
+    # g-64gb
+    #
+    # 最新のプラン一覧はvagrantのopenstackコマンドで取得できます。
+    # 以下のコマンドを実行して下さい。
+    #
+    # $ vagrant openstack flavor-list
+    #
+    conoha.flavor             = 'g-1gb'
+
+    # VPSのイメージを指定します。
+    # 2015/08/27現在、以下のイメージが利用可能です。
+    #
+    # vmi-archlinux-x86_64
+    # vmi-centos-6.6-i386
+    # vmi-centos-6.6-x86_64
+    # vmi-centos-6.7-i386
+    # vmi-centos-6.7-x86_64
+    # vmi-centos-7.1-x86_64
+    # vmi-concrete5-centos-6.7
+    # vmi-debian-7-amd64
+    # vmi-debian-7-i386
+    # vmi-debian-8-amd64
+    # vmi-debian-8-i386
+    # vmi-docker-1.7.1-ubuntu-14.04
+    # vmi-drupal-7.36-centos-6.6
+    # vmi-fedora-21-x86_64
+    # vmi-fedora-22-x86_64
+    # vmi-freebsd-10.1-x86_64
+    # vmi-freebsd-10.1-zfs-x86_64
+    # vmi-gitlab-7.9.1-centos-6.6
+    # vmi-hadoop-2.6-master-centos-6.6
+    # vmi-hadoop-2.6-slave-centos-6.6
+    # vmi-hinemos-5.0-centos-7.1
+    # vmi-jenkins-1.6-centos-6.6
+    # vmi-lamp-centos-6.6
+    # vmi-meanstack-centos-6.6
+    # vmi-opensuse-13.2-x86_64
+    # vmi-owncloud-8-centos-6.6
+    # vmi-redmine-3.0-centos-6.6
+    # vmi-ror-4.2-centos-6.6
+    # vmi-scientificlinux-7.1-x86_64
+    # vmi-ubuntu-12.04-amd64
+    # vmi-ubuntu-12.04-i386
+    # vmi-ubuntu-14.04-amd64
+    # vmi-ubuntu-14.04-i386
+    # vmi-wp-4.3-centos-6-6
+    #
+    # 最新のイメージ一覧は、vagrantのopenstackコマンドで取得できます。
+    # 以下のコマンドを実行してください。
+    #
+    # $ vagrant openstack image-list
+    #
+    conoha.image              = 'vmi-ubuntu-14.04-amd64'
+
+    # リージョンを指定します。
+    # 東京(tyo1)、シンガポール(sin1)、アメリカ(sjc1)から指定して下さい。
+    #
+    # conoha.openstack_auth_urlも忘れずに変更して下さい。
+    conoha.region             = "tyo1"
+
+    # VPSのrootパスワードを設定します。
+    #
+    # 空文字の場合はパスワードは設定されません
+    # その場合コンソールログインは不可になります(SSHの公開鍵認証はログイン可能)
+    conoha.admin_pass         = ""
+
+    # VPSのネームタグを指定します。
+    # コントロールパネル上に表示される名前です。
+    conoha.metadata           = {
+      instance_name_tag: "vagrant_conoha"
+    }
+
+    # セキュリティグループを指定します。
+    #
+    # NOTE: 一度もコントロールパネルからVPSを作成したことがない場合、
+    #       以下のセキュリティグループが無いためエラーになることがあります。
+    #       その場合は、コントロールパネルからVPSを作成して、すぐ削除して
+    #       その後、このプラグインを試して下さい。
+    conoha.security_groups    = [
+      "default",
+      "gncs-ipv4-all",
+      "gncs-ipv6-all"
+    ]
+
+    # SSH公開鍵を指定します。
+    # コントロールパネルの「SSH Key」にある名前を指定して下さい。
+    # config.ssh.private_key_pathもともに指定する必要があります。
+    #
+    # 指定が無い場合は、Vagrantが新しい鍵ペアを自動作成します。
+    #
+    # conoha.keypair_name       = "my-keypair"
+
   end
 
-  config.vm.synced_folder "../source", "/vagrant-openstack"
-
-  config.vm.provision "shell", inline: $script
-
+  # すでにSSH公開鍵をコントロールパネルに登録している場合は、
+  # ここで秘密鍵のパスを指定します。
+  # keypair_nameとともに指定します。
+  #
+  # config.ssh.private_key_path = "~/.ssh/id_rsa"
 end
