@@ -116,10 +116,8 @@ module VagrantPlugins
 
         def confirm_rsync_installed(env)
           # Install rsync if not installed
-          r = env[:machine].communicate.execute('which rsync', {error_check: false})
-          if r  == 0
-            return
-          end
+          exit_code = env[:machine].communicate.sudo('which rsync', error_check: false)
+          return if exit_code == 0 || exit_code.nil?
 
           config = env[:machine].provider_config
 
