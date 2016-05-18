@@ -36,6 +36,7 @@ VAGRANTFILE_API_VERSION = "2"
 Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
   config.vm.box       = 'conoha'
   config.ssh.username = 'root'
+  config.ssh.pty      = true
 
   config.vm.provider :conoha do |conoha|
     conoha.openstack_auth_url = 'https://identity.tyo1.conoha.io/v2.0'

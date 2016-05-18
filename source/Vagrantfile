@@ -20,6 +20,9 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
   # vagrantがSSH接続する際のユーザ名を指定します。
   config.ssh.username = 'root'
 
+  # CentOS系など/etc/sudoersにrequirettyが書いてある場合に必要になります。
+  config.ssh.pty      = true
+
   config.vm.provider :conoha do |conoha|
 
     # IdentityEndpointを指定します
