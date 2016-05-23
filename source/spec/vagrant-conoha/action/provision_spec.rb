@@ -17,7 +17,7 @@ class FakeShellProvisioner < FakeProvisioner
   end
 end
 
-describe VagrantPlugins::Openstack::Action::ProvisionWrapper do
+describe VagrantPlugins::ConoHa::Action::ProvisionWrapper do
   let(:app) do
     double
   end

@@ -1,7 +1,7 @@
-require 'vagrant-openstack-provider/command/openstack_command'
+require 'vagrant-conoha/command/openstack_command'
 
 module VagrantPlugins
-  module Openstack
+  module ConoHa
     module Command
       class FloatingIpList < OpenstackCommand
         def self.synopsis

@@ -1,6 +1,6 @@
-require 'vagrant-openstack-provider/spec_helper'
+require 'vagrant-conoha/spec_helper'
 
-describe VagrantPlugins::Openstack::Command::FloatingIpList do
+describe VagrantPlugins::ConoHa::Command::FloatingIpList do
   describe 'cmd' do
     let(:nova) do
       double('nova').tap do |nova|
@@ -45,7 +45,7 @@ describe VagrantPlugins::Openstack::Command::FloatingIpList do
     end
 
     before :each do
-      @floating_ip_list_cmd = VagrantPlugins::Openstack::Command::FloatingIpList.new(nil, env)
+      @floating_ip_list_cmd = VagrantPlugins::ConoHa::Command::FloatingIpList.new(nil, env)
     end
 
     it 'prints floating ip and floating ip pool from server' do
