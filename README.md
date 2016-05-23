@@ -30,8 +30,8 @@ $ vagrant plugin install vagrant-conoha
 
 次に以下の内容でVagrantfileを作成します。各パラメータの解説は[こちら](https://github.com/hironobu-s/vagrant-conoha/blob/master/source/Vagrantfile)
 
-```ruby
-VAGRANTFILE_API_VERSION = "2"
+```VAGRANTFILE
+ruby_API_VERSION = "2"
 
 Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
   config.vm.box       = 'conoha'

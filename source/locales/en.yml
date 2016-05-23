@@ -134,6 +134,10 @@ en:
         standard vagrant configuration option `config.ssh.username` instead
       ssh_username_required: |-
         vagrant standard configuration option `ssh.username` is required
+      ssh_timeout_deprecated: |-
+        ssh_timeout provider config is deprecated for vagrant-openstack provider.
+        If you are using it, it will continue to work but we recommend switching
+        to the standard vagrant configuration option `config.vm.boot_timeout`.
       invalid_value_for_parameter: |-
         Invalid value '%{value}' for parameter '%{parameter}'
       invalid_admin_pass: |-
@@ -177,14 +181,14 @@ en:
       sync_method_error: |-
         Value '%{sync_method_value}' is not allowed for 'sync_method' configuration parameter. Valid values are 'rsync' and 'none'
       rsync_error: |-
-        There was an error when attemping to rsync a share folder.
+        There was an error when attempting to rsync a share folder.
         Please inspect the error message below for more info.
 
         Host path: %{hostpath}
         Guest path: %{guestpath}
         Error: %{stderr}
       ssh_unavailble: |-
-        SSH server anavailable on instance %{host}. You should maybe increase the timeout value which currently is %{timeout} second(s).
+        SSH server unavailable on instance %{host}. You should maybe increase the timeout value which currently is %{timeout} second(s).
       no_arg_required_for_command: |-
         Command '%{cmd}' does not required any argument.
       unrecognized_arg_for_command: |-

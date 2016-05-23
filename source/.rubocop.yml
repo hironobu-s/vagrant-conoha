@@ -1,5 +1,6 @@
 AllCops:
   Exclude:
+    - '.bundle/**/*'
     - 'out/**/*'
     - '**/Vagrantfile'
 
@@ -10,6 +11,9 @@ Style/Encoding:
   Enabled: false
 
 Style/Documentation:
+  Enabled: false
+
+Style/ClassVars:
   Enabled: false
 
 Metrics/ClassLength:
