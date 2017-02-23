@@ -52,6 +52,11 @@ module VagrantPlugins
       #
       attr_accessor :tenant_name
 
+      #
+      # The name of the openstack project on witch the vm will be created, changed name in v3 identity API.
+      #
+      attr_accessor :project_name
+
       # The name of the server. This defaults to the name of the machine
       # defined by Vagrant (via `config.vm.define`), but can be overriden
       # here.
@@ -61,6 +66,11 @@ module VagrantPlugins
       #
       # @return [String]
       attr_accessor :username
+
+      # The domain name to access Openstack, this defaults to Default.
+      #
+      # @return [String]
+      attr_accessor :domain_name
 
       # The name of the keypair to use.
       #
@@ -87,6 +97,8 @@ module VagrantPlugins
 
       # Opt files/directories in to the rsync operation performed by this provider
       #
+      # @deprecated Use standard Vagrant synced folders instead.
+      #
       # @return [Array]
       attr_accessor :rsync_includes
 
@@ -108,11 +120,15 @@ module VagrantPlugins
 
       # Sync folder method. Can be either "rsync" or "none"
       #
+      # @deprecated Use standard Vagrant synced folders instead.
+      #
       # @return [String]
       attr_accessor :sync_method
 
       # Sync folder ignore files. A list of files containing exclude patterns to ignore in the rsync operation
       #  performed by this provider
+      #
+      # @deprecated Use standard Vagrant synced folders instead.
       #
       # @return [Array]
       attr_accessor :rsync_ignore_files
@@ -172,6 +188,16 @@ module VagrantPlugins
       # @return [String]
       attr_accessor :endpoint_type
 
+      # Specify the endpoint_type to use : publicL, admin, or internal (default is public)
+      #
+      # @return [String]
+      attr_accessor :interface_type
+
+      # Specify the authentication version to use : 2 or 3 (ddefault is 2()
+      #
+      # @return [String]
+      attr_accessor :identity_api_version
+
       #
       # @return [Integer]
       attr_accessor :server_create_timeout
@@ -204,6 +230,20 @@ module VagrantPlugins
       # @return [Boolean]
       attr_accessor :meta_args_support
 
+      # A switch for enabling the legacy synced folders implementation.
+      #
+      # This defaults to false, but is automatically set to true if any of the
+      # legacy synced folder options are used:
+      #
+      #   - {#rsync_includes}
+      #   - {#rsync_ignore_files}
+      #   - {#sync_method}
+      #
+      # @deprecated Use standard Vagrant synced folders instead.
+      #
+      # @return [Boolean]
+      attr_accessor :use_legacy_synced_folders
+
       def initialize
         @password = UNSET_VALUE
         @openstack_compute_url = UNSET_VALUE
@@ -213,6 +253,8 @@ module VagrantPlugins
         @openstack_image_url = UNSET_VALUE
         @openstack_auth_url = UNSET_VALUE
         @endpoint_type = UNSET_VALUE
+        @interface_type = UNSET_VALUE
+        @identity_api_version = UNSET_VALUE
         @region = UNSET_VALUE
         @flavor = UNSET_VALUE
         @image = UNSET_VALUE
@@ -248,6 +290,7 @@ module VagrantPlugins
         @stack_delete_timeout = UNSET_VALUE
         @meta_args_support = UNSET_VALUE
         @http = HttpConfig.new
+        @use_legacy_synced_folders = UNSET_VALUE
       end
 
       def merge(other)
@@ -288,7 +331,7 @@ module VagrantPlugins
         result
       end
 
-      # rubocop:disable Metrics/CyclomaticComplexity
+      # rubocop:disable Metrics/CyclomaticComplexity,Metrics/PerceivedComplexity
       def finalize!
         @password = nil if @password == UNSET_VALUE
         @openstack_compute_url = nil if @openstack_compute_url == UNSET_VALUE
@@ -298,19 +341,20 @@ module VagrantPlugins
         @openstack_image_url = nil if @openstack_image_url == UNSET_VALUE
         @openstack_auth_url = nil if @openstack_auth_url == UNSET_VALUE
         @endpoint_type = 'publicURL' if @endpoint_type == UNSET_VALUE
+        @interface_type = 'public' if @interface_type == UNSET_VALUE
+        @identity_api_version = '2' if @identity_api_version == UNSET_VALUE
         @region = nil if @region == UNSET_VALUE
         @flavor = nil if @flavor == UNSET_VALUE
         @image = nil if @image == UNSET_VALUE
         @volume_boot = nil if @volume_boot == UNSET_VALUE
         @tenant_name = nil if @tenant_name == UNSET_VALUE
+        @project_name = nil if @project_name == UNSET_VALUE
         @server_name = nil if @server_name == UNSET_VALUE
         @username = nil if @username == UNSET_VALUE
-        @rsync_includes = nil if @rsync_includes.empty?
-        @rsync_ignore_files = nil if @rsync_ignore_files.empty?
+        @domain_name = 'Default' if @domain_name == UNSET_VALUE
         @floating_ip = nil if @floating_ip == UNSET_VALUE
         @floating_ip_pool = nil if @floating_ip_pool == UNSET_VALUE
         @floating_ip_pool_always_allocate = false if floating_ip_pool_always_allocate == UNSET_VALUE
-        @sync_method = 'rsync' if @sync_method == UNSET_VALUE
         @keypair_name = nil if @keypair_name == UNSET_VALUE
         @admin_pass = nil if @admin_pass == UNSET_VALUE
         @public_key_path = nil if @public_key_path == UNSET_VALUE
@@ -320,6 +364,27 @@ module VagrantPlugins
         @user_data = nil if @user_data == UNSET_VALUE
         @metadata = nil if @metadata == UNSET_VALUE
         @ssh_disabled = false if @ssh_disabled == UNSET_VALUE
+
+        # The value of use_legacy_synced_folders is used by action chains
+        # to determine which synced folder implementation to run.
+        if @use_legacy_synced_folders == UNSET_VALUE
+          @use_legacy_synced_folders = !(
+            (@rsync_includes.nil? || @rsync_includes.empty?) &&
+            (@rsync_ignore_files.nil? || @rsync_ignore_files.empty?) &&
+            (@sync_method.nil? || @sync_method == UNSET_VALUE))
+        end
+
+        if @use_legacy_synced_folders
+          # Original defaults.
+          @rsync_includes = nil if @rsync_includes.empty?
+          @rsync_ignore_files = nil if @rsync_ignore_files.empty?
+          @sync_method = 'rsync' if @sync_method == UNSET_VALUE
+        else
+          # Disable all sync settings.
+          @rsync_includes = nil
+          @rsync_ignore_files = nil
+          @sync_method = nil
+        end
 
         # The SSH values by default are nil, and the top-level config
         # `config.ssh` and `config.vm.boot_timeout` values are used.
@@ -338,8 +403,10 @@ module VagrantPlugins
         @stacks = nil if @stacks.empty?
         @http.finalize!
       end
-      # rubocop:enable Metrics/CyclomaticComplexity
+      # rubocop:enable Metrics/CyclomaticComplexity,Metrics/PerceivedComplexity
 
+      #
+      # @deprecated Use standard Vagrant synced folders instead.
       def rsync_include(inc)
         @rsync_includes << inc
       end
@@ -349,9 +416,9 @@ module VagrantPlugins
 
         errors << I18n.t('vagrant_openstack.config.password_required') if @password.nil? || @password.empty?
         errors << I18n.t('vagrant_openstack.config.username_required') if @username.nil? || @username.empty?
-        errors << I18n.t('vagrant_openstack.config.tenant_name_required') if @tenant_name.nil? || @tenant_name.empty?
-        errors << I18n.t('vagrant_openstack.config.invalid_endpoint_type') unless  %w(publicURL adminURL internalURL).include?(@endpoint_type)
+        errors << I18n.t('vagrant_openstack.config.invalid_api_version') unless  %w(2 3).include?(@identity_api_version)
 
+        validate_api_version(errors)
         validate_ssh_username(machine, errors)
         validate_stack_config(errors)
         validate_ssh_timeout(errors)
@@ -379,11 +446,15 @@ module VagrantPlugins
 
       private
 
-      def validate_admin_pass(errors)
-        return if @admin_pass == '' || @admin_pass.nil?
-
-        reg = /\A(?=.*?[A-Z])(?=.*?[a-z])(?=.*?\d)(?=.*?[!-~&&[^A-Za-z\d]])[!-~]{9,70}+\z/
-        errors << I18n.t('vagrant_openstack.config.invalid_admin_pass') unless @admin_pass =~ reg
+      def validate_api_version(errors)
+        if @identity_api_version == '2'
+          errors << I18n.t('vagrant_openstack.config.tenant_name_required') if @tenant_name.nil? || @tenant_name.empty?
+          errors << I18n.t('vagrant_openstack.config.invalid_endpoint_type') unless  %w(publicURL adminURL internalURL).include?(@endpoint_type)
+        elsif @identity_api_version == '3'
+          errors << I18n.t('vagrant_openstack.config.domain_required') if @domain_name.nil? || @domain_name.empty?
+          errors << I18n.t('vagrant_openstack.config.project_name_required') if @project_name.nil? || @project_name.empty?
+          errors << I18n.t('vagrant_openstack.config.invalid_interface_type') unless  %w(public admin internal).include?(@interface_type)
+        end
       end
 
       def validate_stack_config(errors)

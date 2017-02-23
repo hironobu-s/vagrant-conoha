@@ -140,8 +140,19 @@ en:
         to the standard vagrant configuration option `config.vm.boot_timeout`.
       invalid_value_for_parameter: |-
         Invalid value '%{value}' for parameter '%{parameter}'
-      invalid_admin_pass: |-
-        admin_pass must be contain at least 9 characters, least 1 number and both lower and uppercase letters, and specialcharacters.
+      sync_folders_deprecated: |-
+        The following configuration settings are deprecated and should be
+        removed: rsync_includes, rsync_ignore_files, sync_method. Using these
+        settings causes the OpenStack provider to fall back to an old synced
+        folder implementation instead of using standard Vagrant synced folders.
+      domain_required: |-
+        A domain is required when using identity API version 3
+      project_name_required: |-
+        A project name is required when using identity API version 3
+      invalid_interface_type: |-
+        Interface type must be public, admin or internal (if not provided, default is public)
+      invalid_api_version: |-
+        identity API verison must be 2 or 3 (if nto provided, default is 2)
 
     errors:
       default: |-

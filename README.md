@@ -63,7 +63,6 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
   # config.ssh.private_key_path = "~/.ssh/id_rsa"
 end
 
-
 ```
 
 そしてお待ちかねvagrant upを実行します。

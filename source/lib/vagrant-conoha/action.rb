@@ -39,7 +39,13 @@ module VagrantPlugins
               else
                 b2.use Provision
               end
-              b2.use SyncFolders
+              if env[:machine].provider_config.use_legacy_synced_folders
+                env[:machine].ui.warn I18n.t('vagrant_openstack.config.sync_folders_deprecated')
+                b2.use SyncFolders
+              else
+                # Standard Vagrant implementation.
+                b2.use SyncedFolders
+              end
             end
           end
         end
@@ -61,6 +67,7 @@ module VagrantPlugins
       # key.
       def self.action_read_state
         new_builder.tap do |b|
+          b.use HandleBox
           b.use ConfigValidate
           b.use ConnectOpenstack
           b.use ReadState
@@ -97,6 +104,7 @@ module VagrantPlugins
 
       def self.action_up
         new_builder.tap do |b|
+          b.use HandleBox
           b.use ConfigValidate
           b.use ConnectOpenstack
 
@@ -111,7 +119,15 @@ module VagrantPlugins
                   b2.use Provision
                 end
               end
-              b2.use SyncFolders
+
+              if env[:machine].provider_config.use_legacy_synced_folders
+                env[:machine].ui.warn I18n.t('vagrant_openstack.config.sync_folders_deprecated')
+                b2.use SyncFolders
+              else
+                # Standard Vagrant implementation.
+                b2.use SyncedFolders
+              end
+
               b2.use CreateStack
               b2.use CreateServer
               b2.use Message, I18n.t('vagrant_openstack.ssh_disabled_provisioning') if ssh_disabled
