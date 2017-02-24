@@ -13,10 +13,6 @@ VAGRANTFILE_API_VERSION = "2"
 
 Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
 
-  # このプラグインではConoHa(OpenStack)のイメージを使用するため、boxは利用できません。
-  # このパラメータを変更する必要はありません。
-  config.vm.box       = 'conoha'
-
   # vagrantがSSH接続する際のユーザ名を指定します。
   config.ssh.username = 'root'
 
@@ -36,8 +32,9 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
     conoha.tenant_name        = 'gnct*******'
 
     # VPSのスペックを指定します(g-1gbの場合は1GBプランになります)。
-    # 2015/08/27現在、以下のプランが利用可能です。
+    # 2017/02/23現在、以下のプランが利用可能です。
     #
+    # g-512mb
     # g-1gb
     # g-2gb
     # g-4gb
@@ -46,7 +43,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
     # g-32gb
     # g-64gb
     #
-    # 最新のプラン一覧はvagrantのopenstackコマンドで取得できます。
+    # 最新のプラン一覧はvagrantのopenstackサブコマンドで取得できます。
     # 以下のコマンドを実行して下さい。
     #
     # $ vagrant openstack flavor-list
@@ -54,49 +51,12 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
     conoha.flavor             = 'g-1gb'
 
     # VPSのイメージを指定します。
-    # 2015/08/27現在、以下のイメージが利用可能です。
-    #
-    # vmi-archlinux-x86_64
-    # vmi-centos-6.6-i386
-    # vmi-centos-6.6-x86_64
-    # vmi-centos-6.7-i386
-    # vmi-centos-6.7-x86_64
-    # vmi-centos-7.1-x86_64
-    # vmi-concrete5-centos-6.7
-    # vmi-debian-7-amd64
-    # vmi-debian-7-i386
-    # vmi-debian-8-amd64
-    # vmi-debian-8-i386
-    # vmi-docker-1.7.1-ubuntu-14.04
-    # vmi-drupal-7.36-centos-6.6
-    # vmi-fedora-21-x86_64
-    # vmi-fedora-22-x86_64
-    # vmi-freebsd-10.1-x86_64
-    # vmi-freebsd-10.1-zfs-x86_64
-    # vmi-gitlab-7.9.1-centos-6.6
-    # vmi-hadoop-2.6-master-centos-6.6
-    # vmi-hadoop-2.6-slave-centos-6.6
-    # vmi-hinemos-5.0-centos-7.1
-    # vmi-jenkins-1.6-centos-6.6
-    # vmi-lamp-centos-6.6
-    # vmi-meanstack-centos-6.6
-    # vmi-opensuse-13.2-x86_64
-    # vmi-owncloud-8-centos-6.6
-    # vmi-redmine-3.0-centos-6.6
-    # vmi-ror-4.2-centos-6.6
-    # vmi-scientificlinux-7.1-x86_64
-    # vmi-ubuntu-12.04-amd64
-    # vmi-ubuntu-12.04-i386
-    # vmi-ubuntu-14.04-amd64
-    # vmi-ubuntu-14.04-i386
-    # vmi-wp-4.3-centos-6-6
-    #
-    # 最新のイメージ一覧は、vagrantのopenstackコマンドで取得できます。
+    # 最新のイメージ一覧は、vagrantのopenstackサブコマンドで取得できます。
     # 以下のコマンドを実行してください。
     #
     # $ vagrant openstack image-list
     #
-    conoha.image              = 'vmi-ubuntu-14.04-amd64'
+    conoha.image              = 'vmi-ubuntu-16.04-amd64-unified'
 
     # リージョンを指定します。
     # 東京(tyo1)、シンガポール(sin1)、アメリカ(sjc1)から指定して下さい。
