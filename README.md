@@ -34,7 +34,6 @@ $ vagrant plugin install vagrant-conoha
 ruby_API_VERSION = "2"
 
 Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
-  config.vm.box       = 'conoha'
   config.ssh.username = 'root'
   config.ssh.pty      = true
 
@@ -71,7 +70,11 @@ end
 $ vagrant up --provider=conoha
 ```
 
-## 詳細
+## 互換性
+
+0.1.7以降、Vagrantfile内の **config.vm.box** パラメータが削除されました。指定するとエラーになります。Vagrantfileを引き継ぐ場合はご注意下さい。
+
+## 参考
 
 下記URLをご覧下さい。
 [VagrantからConoHaを使う - Qiita](http://qiita.com/hironobu_s/items/8422a427fd5571747196)
