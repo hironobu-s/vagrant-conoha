@@ -96,6 +96,15 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
     #
     # conoha.keypair_name       = "my-keypair"
 
+    # スタートアップスクリプトを指定します。
+    # cloud-config形式、シェルスクリプト形式、どちらでも記述できます。
+    # Base64エンコードする必要はありません。
+    #
+    # 詳細は下記URLを参考にしてください。
+    # https://www.conoha.jp/guide/startupscript.php
+    #
+    # conoha.user_data = ""
+
   end
 
   # すでにSSH公開鍵をコントロールパネルに登録している場合は、
