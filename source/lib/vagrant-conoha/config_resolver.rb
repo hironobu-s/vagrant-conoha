@@ -33,9 +33,29 @@ module VagrantPlugins
         resolve_image_internal(env, env[:machine].provider_config.volume_boot[:image])
       end
 
-      def resolve_keypair(env)
+      def resolve_floating_ip(env)
         config = env[:machine].provider_config
         nova = env[:openstack_client].nova
+        return config.floating_ip if config.floating_ip
+
+        fail Errors::UnableToResolveFloatingIP if config.floating_ip_pool.nil? || config.floating_ip_pool.empty?
+
+        @logger.debug 'Searching for available ips'
+        free_ip = search_free_ip(config, nova, env)
+        config.floating_ip = free_ip
+        return free_ip unless free_ip.nil?
+
+        @logger.debug 'Allocate new ip anyway'
+        allocated_ip = allocate_ip(config, nova, env)
+        config.floating_ip = allocated_ip
+        return allocated_ip unless allocated_ip.nil?
+      end
+
+      def resolve_keypair(env)
+        config = env[:machine].provider_config
+        machine_config = env[:machine].config
+        nova = env[:openstack_client].nova
+        return nil unless machine_config.ssh.insert_key
         return config.keypair_name if config.keypair_name
         return nova.import_keypair_from_file(env, config.public_key_path) if config.public_key_path
         generate_keypair(env)

@@ -56,8 +56,6 @@ module VagrantPlugins
           config          = env[:machine].provider_config
           rsync_includes  = config.rsync_includes.to_a
 
-          confirm_rsync_installed(env)
-
           env[:machine].config.vm.synced_folders.each do |_, data|
             hostpath  = File.expand_path(data[:hostpath], env[:root_path])
             guestpath = data[:guestpath]
@@ -122,22 +120,6 @@ module VagrantPlugins
         end
 
         private
-
-        def confirm_rsync_installed(env)
-          # Install rsync if not installed
-          exit_code = env[:machine].communicate.sudo('which rsync', error_check: false)
-          return if exit_code == 0 || exit_code.nil?
-
-          config = env[:machine].provider_config
-
-          if config.image =~ /debian|ubuntu/
-            env[:ui].detail(I18n.t('vagrant_openstack.confirm_rsync_installed'))
-            env[:machine].communicate.sudo('apt-get update && apt-get install -y rsync')
-          elsif config.image =~ /centos/
-            env[:ui].detail(I18n.t('vagrant_openstack.confirm_rsync_installed'))
-            env[:machine].communicate.sudo('yum -y install rsync')
-          end
-        end
 
         def ssh_key_options(ssh_info)
           # Ensure that `private_key_path` is an Array (for Vagrant < 1.4)

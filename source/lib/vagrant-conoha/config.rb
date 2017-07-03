@@ -223,6 +223,10 @@ module VagrantPlugins
       attr_accessor :stack_delete_timeout
 
       #
+      # @return [Integer]
+      attr_accessor :floating_ip_assign_timeout
+
+      #
       # @return [HttpConfig]
       attr_accessor :http
 
@@ -243,6 +247,16 @@ module VagrantPlugins
       #
       # @return [Boolean]
       attr_accessor :use_legacy_synced_folders
+
+      # Specify the certificate to use.
+      #
+      # @return [String]
+      attr_accessor :ssl_ca_file
+
+      # Verify ssl peer certificate when connecting. Set to false (! unsecure) to disable
+      #
+      # @return [Boolean]
+      attr_accessor :ssl_verify_peer
 
       def initialize
         @password = UNSET_VALUE
@@ -288,9 +302,12 @@ module VagrantPlugins
         @server_delete_timeout = UNSET_VALUE
         @stack_create_timeout = UNSET_VALUE
         @stack_delete_timeout = UNSET_VALUE
+        @floating_ip_assign_timeout = UNSET_VALUE
         @meta_args_support = UNSET_VALUE
         @http = HttpConfig.new
         @use_legacy_synced_folders = UNSET_VALUE
+        @ssl_ca_file = UNSET_VALUE
+        @ssl_verify_peer = UNSET_VALUE
       end
 
       def merge(other)
@@ -397,11 +414,14 @@ module VagrantPlugins
         @server_delete_timeout = 200 if @server_delete_timeout == UNSET_VALUE
         @stack_create_timeout = 200 if @stack_create_timeout == UNSET_VALUE
         @stack_delete_timeout = 200 if @stack_delete_timeout == UNSET_VALUE
+        @floating_ip_assign_timeout = 200 if @floating_ip_assign_timeout == UNSET_VALUE
         @meta_args_support = false if @meta_args_support == UNSET_VALUE
         @networks = nil if @networks.empty?
         @volumes = nil if @volumes.empty?
         @stacks = nil if @stacks.empty?
         @http.finalize!
+        @ssl_ca_file = nil if @ssl_ca_file == UNSET_VALUE
+        @ssl_verify_peer = true if @ssl_verify_peer == UNSET_VALUE
       end
       # rubocop:enable Metrics/CyclomaticComplexity,Metrics/PerceivedComplexity
 
@@ -423,10 +443,12 @@ module VagrantPlugins
         validate_stack_config(errors)
         validate_ssh_timeout(errors)
 
-        if machine.config.ssh.private_key_path
-          puts I18n.t('vagrant_openstack.config.keypair_name_required').yellow unless @keypair_name || @public_key_path
-        else
-          errors << I18n.t('vagrant_openstack.config.private_key_missing') if @keypair_name || @public_key_path
+        if machine.config.ssh.insert_key
+          if machine.config.ssh.private_key_path
+            puts I18n.t('vagrant_openstack.config.keypair_name_required').yellow unless @keypair_name || @public_key_path
+          else
+            errors << I18n.t('vagrant_openstack.config.private_key_missing') if @keypair_name || @public_key_path
+          end
         end
 
         {
