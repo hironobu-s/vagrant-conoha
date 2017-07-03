@@ -150,7 +150,7 @@ describe VagrantPlugins::ConoHa::NovaClient do
           stub_request(:post, 'http://nova/a1b2c3/servers')
             .with(
               body: '{"server":{"name":"inst","imageRef":"img","flavorRef":"flav","key_name":"key","adminPass":"AdminPass123%",'\
-              '"security_groups":[{"name":"default"}],"user_data":"dXNlcl9kYXRhX3Rlc3Q=\n","metadata":"metadata_test"},'\
+              '"security_groups":[{"name":"default"}],"user_data":"dXNlcl9kYXRhX3Rlc3Q=","metadata":"metadata_test"},'\
               '"os:scheduler_hints":"sched_hints_test"}',
               headers:
               {
