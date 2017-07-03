@@ -42,9 +42,30 @@ module VagrantPlugins
         FloatingIP.new(floating_ip['ip'], floating_ip['pool'], floating_ip['instance_id'])
       end
 
-      def get_all_images(env)
-        images_json = get(env, "#{@session.endpoints[:compute]}/images")
-        JSON.parse(images_json)['images'].map { |fl| Image.new(fl['id'], fl['name'], 'unknown') }
+      def get_all_images(env, headers = {})
+        images_json = get(env, "#{@session.endpoints[:compute]}/images/detail", headers)
+        JSON.parse(images_json)['images'].map do |fl|
+          Image.new(
+            fl['id'],
+            fl['name'],
+            'unknown',
+            nil,
+            fl['minRam'],
+            fl['minDisk'],
+            fl['metadata']
+          )
+        end
+      end
+
+      # Get detailed information about an image
+      #
+      # @param env [Hash] Vagrant action environment
+      # @param image_id [String] Image UUID
+      #
+      # @return [Hash]
+      def get_image_details(env, image_id)
+        image_json = get(env, "#{@session.endpoints[:compute]}/images/#{image_id}")
+        JSON.parse(image_json)['image']
       end
 
       def create_server(env, options)
@@ -126,6 +147,19 @@ module VagrantPlugins
         end
       end
 
+      def check_assigned_floating_ip(env, server_id, floating_ip)
+        instance_exists do
+          addresses = get_server_details(env, server_id)['addresses']
+          addresses.each do |_, network|
+            network.each do |network_detail|
+              return true if network_detail['addr'] == floating_ip
+            end
+          end
+
+          return false
+        end
+      end
+
       def import_keypair(env, public_key)
         keyname = "vagrant-generated-#{Kernel.rand(36**8).to_s(36)}"
 
@@ -174,6 +208,63 @@ module VagrantPlugins
                               }
                             }.to_json)
           JSON.parse(attachment)['volumeAttachment']
+        end
+      end
+
+      # List snapshot images associated with a particular server
+      #
+      # @param env [Hash] Vagrant action environment
+      # @param server_id [String] Server UUID
+      #
+      # @return [Array<VagrantPlugins::Openstack::Domain::Image>]
+      def list_snapshots(env, server_id)
+        get_all_images(env, params: { server: server_id })
+      end
+
+      # Create a named snapsot for a given VM
+      #
+      # @param env [Hash] Vagrant action environment
+      # @param server_id [String] Server UUID
+      # @param snapshot_name [String]
+      #
+      # @return [void]
+      def create_snapshot(env, server_id, snapshot_name)
+        instance_exists do
+          post(
+            env,
+            "#{@session.endpoints[:compute]}/servers/#{server_id}/action",
+            { createImage: {
+              name: snapshot_name,
+              metadata: { vagrant_snapshot: 'true' }
+            } }.to_json)
+        end
+      end
+
+      # Delete an identified snapshot
+      #
+      # @param env [Hash] Vagrant action environment
+      # @param snapshot_id [String] Snapshot UUID
+      #
+      # @return [void]
+      def delete_snapshot(env, snapshot_id)
+        delete(
+          env,
+          "#{@session.endpoints[:compute]}/images/#{snapshot_id}")
+      end
+
+      # Restore a VM to an identified snapshot
+      #
+      # @param env [Hash] Vagrant action environment
+      # @param server_id [String] Server UUID
+      # @param snapshot_id [String] Snapshot UUID
+      #
+      # @return [void]
+      def restore_snapshot(env, server_id, snapshot_id)
+        instance_exists do
+          post(
+            env,
+            "#{@session.endpoints[:compute]}/servers/#{server_id}/action",
+            { rebuild: { imageRef: snapshot_id } }.to_json)
         end
       end
 
