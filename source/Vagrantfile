@@ -19,8 +19,13 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
   # CentOS系など/etc/sudoersにrequirettyが書いてある場合に必要になります。
   config.ssh.pty      = true
 
-  config.vm.provider :conoha do |conoha|
+  # ローカルのフォルダをホスト側のフォルダと同期することが出来ます。
+  # 必要に応じてコメントを外してください。
+  # https://www.vagrantup.com/docs/synced-folders/
+  #
+  # config.vm.synced_folder "./src", "/src"
 
+  config.vm.provider :conoha do |conoha|
     # IdentityEndpointを指定します
     # 東京以外のリージョンを利用する場合は変更して下さい。
     conoha.openstack_auth_url = 'https://identity.tyo1.conoha.io/v2.0'
@@ -95,6 +100,10 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
     # 指定が無い場合は、Vagrantが新しい鍵ペアを自動作成します。
     #
     # conoha.keypair_name       = "my-keypair"
+
+    # Vagrantのsynced_folder を使う場合の同期方法を指定します。
+    # 設定できるのは"rsync"と"none"です。特に変更する必要はありません。
+    conoha.sync_method = "rsync"
 
     # スタートアップスクリプトを指定します。
     # cloud-config形式、シェルスクリプト形式、どちらでも記述できます。
