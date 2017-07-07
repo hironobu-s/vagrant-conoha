@@ -56,6 +56,8 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
       "gncs-ipv4-all",
       "gncs-ipv6-all"
     ]
+
+    conoha.sync_method = "rsync"
     # conoha.keypair_name       = "hironobu-key"
 
   end
