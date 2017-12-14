@@ -4,7 +4,7 @@ module VagrantPlugins
     # Stable versions must respect the pattern given
     # by VagrantPlugins::ConoHa::VERSION_PATTERN
     #
-    VERSION = '0.1.9'
+    VERSION = '0.1.10'
 
     #
     # Stable version must respect the naming convention 'x.y.z'
