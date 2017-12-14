@@ -43,7 +43,9 @@ module VagrantPlugins
             url = se[0][endpoint_type].strip
           else
             se.each do |endpoint|
-              url = endpoint[endpoint_type].strip if endpoint['region'].eql? config.region
+              if endpoint.key? endpoint_type
+                url = endpoint[endpoint_type].strip if endpoint['region'].eql? config.region
+              end
             end
           end
           endpoints[service['type'].to_sym] = url unless url.nil? || url.empty?
