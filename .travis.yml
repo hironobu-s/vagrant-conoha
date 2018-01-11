@@ -1,15 +1,15 @@
 language: ruby
 
 before_install:
+  - rvm gemset create travis
+  - rmv gemset use travis
   - gem install bundler -v ${BUNDLER_VERSION}
   - cd source
   - sed -i -e "s/\(gem 'vagrant'.*tag. \)'[^']*'\(.*\)/\1'${VAGRANT_VERSION}'\2/" Gemfile
 
-install:
-  - travis_retry bundler _${BUNDLER_VERSION}_ install --without debug
-
 script:
-  - bundler _${BUNDLER_VERSION}_ exec rake
+  - travis_retry bundle _${BUNDLER_VERSION}_ install --without debug
+  - bundle _${BUNDLER_VERSION}_ exec rake
 
 matrix:
   include:
