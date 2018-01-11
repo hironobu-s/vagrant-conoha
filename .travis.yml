@@ -1,10 +1,8 @@
 language: ruby
 
+bundler_args: _${BUNDLER_VERSION}_
 before_install:
-  - rvm gemset use default
-  - gem uninstall bundler
   - gem install bundler -v ${BUNDLER_VERSION}
-  - rvm gemset name
   - gem list
   - cd source
   - sed -i -e "s/\(gem 'vagrant'.*tag. \)'[^']*'\(.*\)/\1'${VAGRANT_VERSION}'\2/" Gemfile
