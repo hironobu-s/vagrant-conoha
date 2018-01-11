@@ -1,9 +1,9 @@
 language: ruby
 
 before_install:
-  - rvm gemset create travis
-  - rvm gemset use travis
   - gem install bundler -v ${BUNDLER_VERSION}
+  - rvm gemset name
+  - gem list
   - cd source
   - sed -i -e "s/\(gem 'vagrant'.*tag. \)'[^']*'\(.*\)/\1'${VAGRANT_VERSION}'\2/" Gemfile
 
