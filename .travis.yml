@@ -1,6 +1,8 @@
 language: ruby
 
 before_install:
+  - rvm gemset use default
+  - gem uninstall bundler
   - gem install bundler -v ${BUNDLER_VERSION}
   - rvm gemset name
   - gem list
