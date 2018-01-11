@@ -1,6 +1,7 @@
 language: ruby
 
 before_install:
+  - gem uninstall -v 1.16.0
   - gem install bundler -v ${BUNDLER_VERSION}
   - cd source
   - sed -i -e "s/\(gem 'vagrant'.*tag. \)'[^']*'\(.*\)/\1'${VAGRANT_VERSION}'\2/" Gemfile
@@ -9,7 +10,7 @@ install:
   - travis_retry bundle _${BUNDLER_VERSION}_ install --without debug
 
 script:
-  - travis_retry bundle _${BUNDLER_VERSION}_ exec rake
+  - bundle _${BUNDLER_VERSION}_ exec rake
 
 matrix:
   include:
