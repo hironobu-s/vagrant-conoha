@@ -6,10 +6,10 @@ before_install:
   - sed -i -e "s/\(gem 'vagrant'.*tag. \)'[^']*'\(.*\)/\1'${VAGRANT_VERSION}'\2/" Gemfile
 
 install:
-  - travis_retry bundle _${BUNDLER_VERSION}_ install --without debug
+  - travis_retry bundler _${BUNDLER_VERSION}_ install --without debug
 
 script:
-  - bundle _${BUNDLER_VERSION}_ exec rake
+  - bundler _${BUNDLER_VERSION}_ exec rake
 
 matrix:
   include:
