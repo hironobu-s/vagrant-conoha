@@ -9,7 +9,7 @@ install:
   - travis_retry bundle _${BUNDLER_VERSION}_ install --without debug
 
 script:
-  - bundle _${BUNDLER_VERSION}_ exec rake
+  - travis_retry bundle _${BUNDLER_VERSION}_ exec rake
 
 matrix:
   include:
