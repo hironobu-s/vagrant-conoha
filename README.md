@@ -2,7 +2,6 @@
 
 [![Gem Version](https://badge.fury.io/rb/vagrant-conoha.svg)](http://badge.fury.io/rb/vagrant-conoha)
 [![Dependency Status](https://gemnasium.com/hironobu-s/vagrant-conoha.svg)](https://gemnasium.com/hironobu-s/vagrant-conoha)
-[![Build Status](https://travis-ci.org/hironobu-s/vagrant-conoha.svg)](https://travis-ci.org/hironobu-s/vagrant-conoha)
 
 [Vagrant](Vagrant ConoHa Provider)1.2以降で使える、[ConoHa](https://www.conoha.jp/)用のProviderです。
 
